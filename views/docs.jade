@@ -1,0 +1,22 @@
+extends layout
+
+block content
+	.docs
+		:markdown
+			# Routes
+				* /users
+					- [ GET ]
+					- Get all users
+				* /users/:id
+					- [ GET ]
+					- Get user by ID
+				* /uses/new
+					- [ POST ]
+					- Add a new user
+				* /users/:id/edit
+					- [ GET ]
+					- Retrieve user to edit
+				* /users/:id/edit
+					- [ PUT ]
+					- Update user by ID
+

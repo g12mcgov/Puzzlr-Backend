@@ -1,20 +1,28 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+/*
+* @Author: Grant McGovern
+* @Date:   2016-03-29 12:40:17
+* @Last Modified by:   Grant McGovern
+* @Last Modified time: 2016-03-31 13:48:52
+*/
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
-
-var app = express();
+var express = require('express'),
+    path = require('path'), 
+    favicon = require('serve-favicon'), 
+    logger = require('morgan'), 
+    cookieParser = require('cookie-parser'), 
+    bodyParser = require('body-parser');
 
 // Database
-var db = require('./model/db');
+var db = require('./model/db'),
+    user = require('./model/users');
 
-// Models
-var user = require('./model/user');
+var routes = require('./routes/index'),
+    users = require('./routes/users'),
+    docs = require('./routes/docs');
+
+
+// App
+var app = express();
 
 
 // view engine setup
@@ -30,6 +38,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
+app.use('/docs', docs);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
@@ -63,12 +72,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
-
-// Nodemon 
-// app.set('port', process.env.PORT || 3000);
-// var server = app.listen(app.get('port'), function() {
-// 	console.log('Express server listening on port ' + server.address().port);
-// });
 
 module.exports = app;

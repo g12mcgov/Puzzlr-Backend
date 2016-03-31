@@ -6,3 +6,17 @@ body {
 a {
   color: #00B7FF;
 }
+
+.home-page img {
+	display: block;
+	margin: 0 auto;
+}
+
+.home-page h1 {
+	text-align: center;
+}
+
+.home-page a {
+	display: block;
+	text-align: center;
+}

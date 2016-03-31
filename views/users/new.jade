@@ -1,0 +1,18 @@
+extends ../layout
+
+block content
+    h1.
+        #{title}
+    form#formAddBlob(name="addblob",method="post",action="/users")
+        p firstName: 
+            input#inputFirstName(type="text", placeholder="ex. Grant", name="firstName")
+        p lastName:
+            input#inputLastName(type="text", placeholder="ex. McGovern", name="lastName")
+        p email: 
+            input#inputLastName(type="text", placeholder="ex. mcgoga12@wfu.edu", name="email")
+        p picture: 
+            input#inputLastName(type="text", placeholder="ex. http://bit.ly/1RPP1H9", name="picture")
+        p questions:
+            input#inputLastName(type="text", placeholder="ex. []", name="questions")
+        p
+            button#btnSubmit(type="submit") submit
