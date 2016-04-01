@@ -4,8 +4,8 @@ var userSchema = new mongoose.Schema({
 		lastName: String,
 		email: String,
 		picture: String,
-		posts_from: [],
-		posts_to: []
-});
+		posts_recieved: [],
+		posts_sent: []
+}, { collection: 'users', strict: false } );
 mongoose.model('User', userSchema);
 
