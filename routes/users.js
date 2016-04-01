@@ -2,7 +2,7 @@
 * @Author: Grant McGovern
 * @Date:   2016-03-29 12:43:03
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-03-31 13:21:08
+* @Last Modified time: 2016-03-31 20:07:38
 */
 
 /**
@@ -35,7 +35,7 @@ router.route('/')
     // GET all blobs
     .get(function(req, res, next) {
         //retrieve all blobs from Monogo
-        mongoose.model('User').find({}, function (err, users) {
+        mongoose.model('User').find({}, function(err, users) {
               if (err) {
                   return console.error(err);
               } else {
@@ -43,20 +43,22 @@ router.route('/')
                   res.format({
                       //HTML response will render the index.jade file in the views/blobs folder. We are also setting "blobs" to be an accessible variable in our jade view
                     html: function(){
+                        console.log(users);
                         res.render('users/index', {
                               title: 'All Users',
                               "users" : users
                           });
                     },
-                    //JSON response will show all blobs in JSON format
+                    // JSON response will show all blobs in JSON format
                     json: function(){
+                        console.log(users);
                         res.json(users);
                     }
                 });
               }     
         });
     })
-  // [ POST ] a new user
+    // [ POST ] a new user
     .post(function(req, res) {
         // Get values from POST request. These can be done through forms or REST calls. These rely on the "name" attributes for forms
       var firstName = req.body.firstName;
@@ -64,13 +66,18 @@ router.route('/')
       var email = req.body.email;
       var picture = req.body.picture;
       var questions = req.body.questions;
+      var friends = req.body.friends;
+      // Notifications should be empty by default
+      var notifications = [];
         // call the create function for our database
         mongoose.model('User').create({
             firstName : firstName,
             lastName : lastName,
             email : email,
             picture : picture,
-            questions: questions
+            questions: questions,
+            friends : friends,
+            notifications : notifications
         }, function (err, user) {
               if (err) {
                   res.send("There was a problem adding the information to the database.");
@@ -226,7 +233,7 @@ router.route('/:id/edit')
 	        } else {
 	            //remove it from Mongo
 	            user.remove(function(err, user) {
-	                if (err) {
+	                if(err) {
 	                    return console.error(err);
 	                } else {
 	                    //Returning success messages saying it was deleted
@@ -248,5 +255,44 @@ router.route('/:id/edit')
 	        }
 	    });
 	});
+
+  /* Send Puzzlr to User */
+  /* GET all users */
+router.route('/:id/send')
+    // [ POST ] a new Puzzlr
+    .post(function(req, res) {
+        // Get values from POST request. These can be done through forms or REST calls. These rely on the "name" attributes for forms
+      var firstName = req.body.firstName;
+      var lastName = req.body.lastName;
+      var email = req.body.email;
+      var picture = req.body.picture;
+      var questions = req.body.questions;
+      // Notifications should be empty by default
+      
+        // Find the document by ID
+      mongoose.model('User').findById(req.id, function(err, user) {
+          // Update
+          user.update({
+              firstName : firstName,
+              lastName : lastName,
+              email : email,
+              picture : picture,
+              questions: questions
+          }, function (err, userID) {
+            if(err) {
+                res.send("There was a problem updating the information to the database: " + err);
+            } 
+            else {
+                    //HTML responds by going back to the page or you can be fancy and create a new view that shows a success page.
+                    res.format({
+                       //JSON responds showing the updated values
+                      json: function() {
+                             res.json(user);
+                       }
+                    });
+             }
+          })
+      });
+    });
 
 module.exports = router;

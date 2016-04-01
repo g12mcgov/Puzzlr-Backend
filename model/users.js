@@ -4,6 +4,8 @@ var userSchema = new mongoose.Schema({
 		lastName: String,
 		email: String,
 		picture: String,
-		questions: []
+		posts_from: [],
+		posts_to: []
 });
 mongoose.model('User', userSchema);
+
