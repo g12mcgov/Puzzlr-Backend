@@ -2,7 +2,7 @@
 * @Author: grantmcgovern
 * @Date:   2016-03-31 20:53:36
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-03-31 22:00:20
+* @Last Modified time: 2016-03-31 22:26:48
 */
 
 
@@ -41,7 +41,6 @@ router.route('/')
                   res.format({
                     // JSON response will show all blobs in JSON format
                     json: function(){
-                        console.log(posts);
                         res.json(posts);
                     }
                 });
@@ -75,9 +74,10 @@ router.route('/')
                    * attach it to the user who sent it AND the user
                    * who is supposed to recieve it.
                    */
-                  mongoose.model('User').findByIdAndUpdate(
-						req.id,
-						{$push: {"posts_from": {test: "test"}}},
+                  /* TO */
+                  mongoose.model('User').findOneAndUpdate(
+                  		{_id: to},
+						{$push: {"posts_from": {question: question, answer: answer}}},
 						{safe: true, upsert: true},
 						function(err, model) {
 							console.log(err);
