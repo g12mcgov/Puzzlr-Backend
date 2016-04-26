@@ -2,7 +2,7 @@
 * @Author: Grant McGovern
 * @Date:   2016-03-29 12:43:03
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-03-31 22:10:21
+* @Last Modified time: 2016-04-26 00:08:39
 */
 
 /**
@@ -65,8 +65,10 @@ router.route('/')
       var lastName = req.body.lastName;
       var email = req.body.email;
       var picture = req.body.picture;
-      var questions = req.body.questions;
+      var facebook_id = req.body.facebook_id;
       var friends = req.body.friends;
+      // Questions should be empty by default
+      var questions = [];
       // Notifications should be empty by default
       var notifications = [];
         // call the create function for our database
@@ -75,6 +77,7 @@ router.route('/')
             lastName : lastName,
             email : email,
             picture : picture,
+            facebook_id : facebook_id,
             questions: questions,
             friends : friends,
             notifications : notifications
@@ -85,13 +88,6 @@ router.route('/')
                   // User has been created
                   console.log('POST creating new user: ' + user);
                   res.format({
-                      //HTML response will set the location and redirect back to the home page. You could also create a 'success' page if that's your thing
-                    html: function(){
-                        // If it worked, set the header so the address bar doesn't still say /adduser
-                        res.location("users");
-                        // And forward to success page
-                        res.redirect("/users");
-                    },
                     //JSON response will show the newly created user
                     json: function(){
                         res.json(user);
@@ -152,6 +148,54 @@ router.route('/:id')
                 "user" : user
               });
           },
+          json: function(){
+              res.json(user);
+          }
+        });
+      }
+    });
+  });
+
+
+// route middleware to validate :address
+router.param('address', function(req, res, next, address) {
+    //console.log('validating ' + id + ' exists');
+    //find the ID in the Database
+    mongoose.model('User').find( { email: address }, function(err, user) {
+        //if it isn't found, we are going to repond with 404
+        if(err) {
+            console.log(address + ' was not found');
+            res.status(404)
+            var err = new Error('Not Found');
+            err.status = 404;
+            res.format({
+                html: function(){
+                    next(err);
+                 },
+                json: function(){
+                       res.json({message : err.status  + ' ' + err});
+                 }
+            });
+        //if it is found we continue on
+        } else {
+            //uncomment this next line if you want to see every JSON document response for every GET/PUT/DELETE call
+            console.log(user);
+            // once validation is done save the new item in the req
+            req.address = address;
+            // go to the next thing
+            next(); 
+        } 
+    });
+});
+
+/* GET user by email */
+router.route('/email/:address')
+  .get(function(req, res) {
+    mongoose.model('User').find( { email: req.address }, function (err, user) {
+      if (err) {
+        console.log('GET Error: There was a problem retrieving: ' + err);
+      } else {
+        res.format({
           json: function(){
               res.json(user);
           }
@@ -255,44 +299,5 @@ router.route('/:id/edit')
 	        }
 	    });
 	});
-
-  /* Send Puzzlr to User */
-  /* GET all users */
-router.route('/:id/send')
-    // [ POST ] a new Puzzlr
-    .post(function(req, res) {
-        // Get values from POST request. These can be done through forms or REST calls. These rely on the "name" attributes for forms
-      var firstName = req.body.firstName;
-      var lastName = req.body.lastName;
-      var email = req.body.email;
-      var picture = req.body.picture;
-      var questions = req.body.questions;
-      // Notifications should be empty by default
-      
-        // Find the document by ID
-      mongoose.model('User').findById(req.id, function(err, user) {
-          // Update
-          user.update({
-              firstName : firstName,
-              lastName : lastName,
-              email : email,
-              picture : picture,
-              questions: questions
-          }, function (err, userID) {
-            if(err) {
-                res.send("There was a problem updating the information to the database: " + err);
-            } 
-            else {
-                    //HTML responds by going back to the page or you can be fancy and create a new view that shows a success page.
-                    res.format({
-                       //JSON responds showing the updated values
-                      json: function() {
-                             res.json(user);
-                       }
-                    });
-             }
-          })
-      });
-    });
 
 module.exports = router;

@@ -4,6 +4,7 @@ var userSchema = new mongoose.Schema({
 		lastName: String,
 		email: String,
 		picture: String,
+		facebook_id: String,
 		posts_recieved: [],
 		posts_sent: []
 }, { collection: 'users', strict: false } );
