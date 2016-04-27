@@ -2,7 +2,7 @@
 * @Author: grantmcgovern
 * @Date:   2016-03-31 20:53:36
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-04-27 10:52:10
+* @Last Modified time: 2016-04-27 11:25:07
 */
 
 
@@ -117,34 +117,6 @@ router.route('/')
         })
     })
 
-    // [ DELETE ] a Blob by ID
-  .delete(function (req, res){
-      //find blob by ID
-      mongoose.model('Post').findById(req.id, function(err, post) {
-          if (err) {
-              return console.error(err);
-          } else {
-              //remove it from Mongo
-              user.remove(function(err, post) {
-                  if(err) {
-                      return console.error(err);
-                  } else {
-                      //Returning success messages saying it was deleted
-                      console.log('DELETE removing ID: ' + post._id);
-                      res.format({
-                           //JSON returns the item with the message that is has been deleted
-                          json: function() {
-                                 res.json({message : 'deleted',
-                                     item : post
-                                 });
-                           }
-                        });
-                  }
-              });
-          }
-      });
-  });
-
 // route middleware to validate :id
 router.param('id', function(req, res, next, id) {
     //console.log('validating ' + id + ' exists');
@@ -193,20 +165,30 @@ router.route('/:id')
     });
   });
 
-/* GET post by ID */
-router.route('/to/:to_id')
+/* DELETE post by ID */
+router.route('/delete/:id')
   .get(function(req, res) {
-    mongoose.model('Post').find({ to: req.to_id }, function(err, post) {
+    mongoose.model('Post').findById(req.id, function(err, post) {
       if (err) {
         console.log('GET Error: There was a problem retrieving: ' + err);
       } else {
-        console.log('GET Retrieving ID: ' + post.to_id);
-        res.format({
-          json: function(){
-              res.json(post);
-          }
-        });
-      }
+        //remove it from Mongo
+          post.remove(function(err, post) {
+              if(err) {
+                  return console.error(err);
+              } else {
+                  //Returning success messages saying it was deleted
+                  console.log('DELETE removing ID: ' + post._id);
+                  res.format({
+                      json: function(){
+                             res.json({message : 'deleted',
+                                 item : post
+                             });
+                       }
+                    });
+              }
+          });
+        }
     });
   });
 
