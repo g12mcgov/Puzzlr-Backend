@@ -2,7 +2,7 @@
 * @Author: Grant McGovern
 * @Date:   2016-03-29 12:43:03
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-04-26 20:31:16
+* @Last Modified time: 2016-04-26 23:47:49
 */
 
 /**
@@ -141,7 +141,6 @@ router.route('/:id')
       if (err) {
         console.log('GET Error: There was a problem retrieving: ' + err);
       } else {
-        console.log('GET Retrieving ID: ' + user._id);
         res.format({
           html: function(){
               res.render('users/show', {

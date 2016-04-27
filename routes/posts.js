@@ -2,7 +2,7 @@
 * @Author: grantmcgovern
 * @Date:   2016-03-31 20:53:36
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-04-26 22:59:01
+* @Last Modified time: 2016-04-26 23:46:59
 */
 
 
@@ -146,7 +146,6 @@ router.route('/:id')
       if (err) {
         console.log('GET Error: There was a problem retrieving: ' + err);
       } else {
-        console.log('GET Retrieving ID: ' + post._id);
         res.format({
           json: function(){
               res.json(post);
