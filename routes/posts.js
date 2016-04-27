@@ -2,7 +2,7 @@
 * @Author: grantmcgovern
 * @Date:   2016-03-31 20:53:36
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-04-27 11:25:07
+* @Last Modified time: 2016-04-27 11:32:51
 */
 
 
@@ -153,6 +153,22 @@ router.param('id', function(req, res, next, id) {
 router.route('/:id')
   .get(function(req, res) {
     mongoose.model('Post').findById(req.id, function(err, post) {
+      if (err) {
+        console.log('GET Error: There was a problem retrieving: ' + err);
+      } else {
+        res.format({
+          json: function(){
+              res.json(post);
+          }
+        });
+      }
+    });
+  });
+
+/* GET post by to_id */
+router.route('/to/:id')
+  .get(function(req, res) {
+    mongoose.model('Post').find( { to: req.id }, function(err, post) {
       if (err) {
         console.log('GET Error: There was a problem retrieving: ' + err);
       } else {
