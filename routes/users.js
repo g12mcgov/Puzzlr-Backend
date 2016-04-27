@@ -2,7 +2,7 @@
 * @Author: Grant McGovern
 * @Date:   2016-03-29 12:43:03
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-04-26 00:08:39
+* @Last Modified time: 2016-04-26 20:31:16
 */
 
 /**
@@ -192,6 +192,51 @@ router.param('address', function(req, res, next, address) {
 router.route('/email/:address')
   .get(function(req, res) {
     mongoose.model('User').find( { email: req.address }, function (err, user) {
+      if (err) {
+        console.log('GET Error: There was a problem retrieving: ' + err);
+      } else {
+        res.format({
+          json: function(){
+              res.json(user);
+          }
+        });
+      }
+    });
+  });
+
+/* VALIDATE Facebook ID */
+// route middleware to validate :facebook_id
+router.param('facebook_id', function(req, res, next, facebook_id) {
+    // Find the facebook_id in the Database
+    mongoose.model('User').find( { facebook_id: req.facebook_id }, function(err, user) {
+        //if it isn't found, we are going to repond with 404
+        if(err) {
+            console.log(facebook_id + ' was not found');
+            res.status(404)
+            var err = new Error('Not Found');
+            err.status = 404;
+            res.format({
+                html: function(){
+                    next(err);
+                 },
+                json: function(){
+                       res.json({message : err.status  + ' ' + err});
+                 }
+            });
+        //if it is found we continue on
+        } else {
+            // once validation is done save the new item in the req
+            req.facebook_id = facebook_id;
+            // go to the next thing
+            next(); 
+        } 
+    });
+});
+
+/* GET user by email */
+router.route('/facebook/:facebook_id')
+  .get(function(req, res) {
+    mongoose.model('User').find( { facebook_id: req.facebook_id }, function (err, user) {
       if (err) {
         console.log('GET Error: There was a problem retrieving: ' + err);
       } else {

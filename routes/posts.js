@@ -2,7 +2,7 @@
 * @Author: grantmcgovern
 * @Date:   2016-03-31 20:53:36
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-03-31 23:23:33
+* @Last Modified time: 2016-04-26 22:59:01
 */
 
 
@@ -57,6 +57,8 @@ router.route('/')
       var choices = req.body.choices;
       var answer = req.body.answer;
 
+      console.log("HERE");
+
         // Create the post in the database
         mongoose.model('Post').create({
             from : from,
@@ -78,23 +80,23 @@ router.route('/')
                    */
                    console.log(post);
                   /* TO */
-                  mongoose.model('User').findOneAndUpdate(
-                  		{_id: to},
-						{$push: {"posts_recieved": {question: question, choices: choices, answer: answer }}},
-						{safe: true, upsert: true},
-						function(err, model) {
-							console.log(err);
-						}
-					);
-                  /* FROM */
-                  mongoose.model('User').findOneAndUpdate(
-                  		{_id: from},
-						{$push: {"posts_sent": {question: question, choices: choices, answer: answer }}},
-						{safe: true, upsert: true},
-						function(err, model) {
-							console.log(err);
-						}
-					);
+             //      mongoose.model('Post').findOneAndUpdate(
+             //      		{_id: to},
+          			// 			{$push: {"posts_recieved": {question: question, choices: choices, answer: answer }}},
+          			// 			{safe: true, upsert: true},
+          			// 			function(err, model) {
+          			// 				console.log(err);
+          			// 			}
+          			// 		);
+             //      /* FROM */
+             //      mongoose.model('Post').findOneAndUpdate(
+             //      		{_id: from},
+        					// 	{$push: {"posts_sent": {question: question, choices: choices, answer: answer }}},
+        					// 	{safe: true, upsert: true},
+        					// 	function(err, model) {
+        					// 		console.log(err);
+        					// 	}
+        					// );
                   res.format({
                     //JSON response will show the newly created post
                     json: function(){
@@ -145,6 +147,54 @@ router.route('/:id')
         console.log('GET Error: There was a problem retrieving: ' + err);
       } else {
         console.log('GET Retrieving ID: ' + post._id);
+        res.format({
+          json: function(){
+              res.json(post);
+          }
+        });
+      }
+    });
+  });
+
+// route middleware to validate :to_id
+router.param('to_id', function(req, res, next, to_id) {
+    //console.log('validating ' + id + ' exists');
+    //find the ID in the Database
+    mongoose.model('Post').find({ to: req.to_id } , function(err, post) {
+        //if it isn't found, we are going to repond with 404
+        if(err) {
+            console.log(to_id + ' was not found');
+            res.status(404)
+            var err = new Error('Not Found');
+            err.status = 404;
+            res.format({
+                html: function(){
+                    next(err);
+                 },
+                json: function(){
+                       res.json({message : err.status  + ' ' + err});
+                 }
+            });
+        //if it is found we continue on
+        } else {
+            //uncomment this next line if you want to see every JSON document response for every GET/PUT/DELETE call
+            console.log(post);
+            // once validation is done save the new item in the req
+            req.to_id = to_id;
+            // go to the next thing
+            next(); 
+        } 
+    });
+  });
+
+/* GET post by ID */
+router.route('/to/:to_id')
+  .get(function(req, res) {
+    mongoose.model('Post').find({ to: req.to_id }, function(err, post) {
+      if (err) {
+        console.log('GET Error: There was a problem retrieving: ' + err);
+      } else {
+        console.log('GET Retrieving ID: ' + post.to_id);
         res.format({
           json: function(){
               res.json(post);
