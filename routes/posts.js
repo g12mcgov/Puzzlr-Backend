@@ -2,7 +2,7 @@
 * @Author: grantmcgovern
 * @Date:   2016-03-31 20:53:36
 * @Last Modified by:   Grant McGovern
-* @Last Modified time: 2016-04-27 11:32:51
+* @Last Modified time: 2016-04-27 11:36:42
 */
 
 
@@ -57,6 +57,37 @@ router.param('to_id', function(req, res, next, to_id) {
         } 
     });
   });
+
+// route middleware to validate :id
+router.param('id', function(req, res, next, id) {
+    //console.log('validating ' + id + ' exists');
+    //find the ID in the Database
+    mongoose.model('Post').findById(id, function(err, post) {
+        //if it isn't found, we are going to repond with 404
+        if(err) {
+            console.log(id + ' was not found');
+            res.status(404)
+            var err = new Error('Not Found');
+            err.status = 404;
+            res.format({
+                html: function(){
+                    next(err);
+                 },
+                json: function(){
+                       res.json({message : err.status  + ' ' + err});
+                 }
+            });
+        //if it is found we continue on
+        } else {
+            //uncomment this next line if you want to see every JSON document response for every GET/PUT/DELETE call
+            console.log(post);
+            // once validation is done save the new item in the req
+            req.id = id;
+            // go to the next thing
+            next(); 
+        } 
+    });
+});
 
 
 /* GET all posts */
@@ -116,38 +147,6 @@ router.route('/')
               }
         })
     })
-
-// route middleware to validate :id
-router.param('id', function(req, res, next, id) {
-    //console.log('validating ' + id + ' exists');
-    //find the ID in the Database
-    mongoose.model('Post').findById(id, function(err, post) {
-        //if it isn't found, we are going to repond with 404
-        if(err) {
-            console.log(id + ' was not found');
-            res.status(404)
-            var err = new Error('Not Found');
-            err.status = 404;
-            res.format({
-                html: function(){
-                    next(err);
-                 },
-                json: function(){
-                       res.json({message : err.status  + ' ' + err});
-                 }
-            });
-        //if it is found we continue on
-        } else {
-            //uncomment this next line if you want to see every JSON document response for every GET/PUT/DELETE call
-            console.log(post);
-            // once validation is done save the new item in the req
-            req.id = id;
-            // go to the next thing
-            next(); 
-        } 
-    });
-});
-
 
 /* GET post by ID */
 router.route('/:id')
